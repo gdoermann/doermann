@@ -83,6 +83,10 @@ TEMPLATE_DIRS = (
     os.path.join(SETTINGS_DIR, 'templates').replace('\\', '/'),
 )
 
+#CONTEXT_PROCESSORS = (
+#
+#)
+
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -91,8 +95,10 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'django.contrib.sites',
     'django.contrib.admin',
+    'limbo',
     'south',
     'django_extensions',
     'registration',
-    'fossa',
+    'doermann.resume',
+
 )
