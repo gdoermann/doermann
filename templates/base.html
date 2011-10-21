@@ -9,29 +9,16 @@
     <meta name="author" content="Greg Doermann" />
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     {% block meta %}{% endblock %}
-    <link rel="stylesheet" href="{{ CSS }}ui-lightness/theme.css" type="text/css" media="all" />
-    <link href="{{THEME}}style.less" rel="stylesheet" type="text/less" media="all" />
-    <link rel="stylesheet" href="{{ CSS }}site.less" type="text/less" media="all" />
     <link href='http://fonts.googleapis.com/css?family=Lato:regular,regularitalic,bold' rel='stylesheet' type='text/css'>
     {%  include 'limbo/framework.header.html' %}
     {% block css %}{% endblock %}
-    <script src="{{ FOSSA_JS }}jquery-1.5.min.js" type="text/javascript"></script>
-    <script src="{{ FOSSA_JS }}jquery-ui-1.8.9.min.js" type="text/javascript"></script>
-    <script src="{{ FOSSA_JS }}less-1.0.41.min.js" type="text/javascript"></script>
     {% block js_header %}{% endblock %}
 </head>
 <body>
 {% block body %}
     {%  block content %}{%  endblock %}
+    {%  include 'limbo/framework.footer.html' %}
     <div class="ui-helper-hidden" >
-        <script src="{{ JS }}jquery.ui.combobox.min.js" type="text/javascript"></script>
-        <script src="{{ JS }}jquery.ui.timepicker.min.js" type="text/javascript"></script>
-        <script src="{{ JS }}jquery.dataTables.js" type="text/javascript"></script>
-        <script src="{{ JS }}jquery.form.js" type="text/javascript"></script>
-        <script src="{{ JS }}fg.menu.js" type="text/javascript"></script>
-        <script type="text/javascript" charset="utf-8" src="{{JS}}autoresize.jquery.min.js"></script>
-        {%  include 'fossa/framework.footer.html' %}
-        <script src="{{ JS }}ppcc.js" type='text/javascript' ></script>
         {% block js %}{% endblock %}
     </div>
 {%  endblock %}

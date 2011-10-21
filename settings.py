@@ -1,72 +1,47 @@
-# Django settings for myproject project.
+# Django settings for doermann project.
 import os
+from django.conf.global_settings import *
+from limbo.conf.secrets import ConfigSettings
+cs = ConfigSettings(ConfigSettings.locals_config_path(__file__))
 
-DEBUG = True
+DEBUG = cs.getboolean('DEBUG', default=False)
 TEMPLATE_DEBUG = DEBUG
 
-ADMINS = (
-    # ('Your Name', 'your_email@domain.com'),
-)
 
-MANAGERS = ADMINS
+CWD = os.path.dirname(__file__)
 
-SETTINGS_DIR = os.path.split(__file__)[0]
+SYSTEM_APPNAME = cs.get('SYSTEM_APPNAME')
+
+ADMINS = cs.items('ADMINS')
+
+MANAGERS = cs.items('MANAGERS', ADMINS)
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': os.path.join(SETTINGS_DIR, 'doermann.db'),                      # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
-    }
+    'default': cs.group_dict('DB_DEFAULT')
 }
 
-# Local time zone for this installation. Choices can be found here:
-# http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-# although not all choices may be available on all operating systems.
-# On Unix systems, a value of None will cause Django to use the same
-# timezone as the operating system.
-# If running in a Windows environment this must be set to the same as your
-# system time zone.
-TIME_ZONE = 'America/Denver'
+TIME_ZONE = cs.get('TIME_ZONE')
 
-# Language code for this installation. All choices can be found here:
-# http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
-
 SITE_ID = 1
-
-# If you set this to False, Django will make some optimizations so as not
-# to load the internationalization machinery.
 USE_I18N = True
-
-# If you set this to False, Django will not format dates, numbers and
-# calendars according to the current locale
 USE_L10N = True
+MEDIA_ROOT = cs.get('MEDIA_ROOT', 'DIRS')
+MEDIA_URL = cs.get('MEDIA_URL', 'DIRS')
+STATIC_URL = 'static/'
+ADMIN_MEDIA_PREFIX = cs.get('ADMIN_MEDIA_PREFIX', 'DIRS')
+LOGIN_REDIRECT_URL = '/'
+SECRET_KEY = cs.get('SECRET_KEY')
 
-# Absolute filesystem path to the directory that will hold user-uploaded files.
-# Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = os.path.join(SETTINGS_DIR, 'static')
-
-# URL that handles the media served from MEDIA_ROOT. Make sure to use a
-# trailing slash if there is a path component (optional in other cases).
-# Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = '/static/'
-
-# URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
-# trailing slash.
-# Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/admin_media/'
-
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = '2jbpir3@w2aa)=-@l(&4#e&__2z(6gh9b$$wl92a6t5a56s@!s'
-
-# List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
 #     'django.template.loaders.eggs.Loader',
+)
+
+TEMPLATE_CONTEXT_PROCESSORS += (
+    'limbo.context.page_context',
+    'limbo.context.request_context',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -75,19 +50,21 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'limbo.middleware.LoginMiddleware',
+    'limbo.middleware.ExceptionsMiddleware',
+    'limbo.middleware.RequestMiddleware',
+    'limbo.middleware.PageMiddleware',
+    'limbo.middleware.AdminDebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'doermann.urls'
 
 TEMPLATE_DIRS = (
-    os.path.join(SETTINGS_DIR, 'templates').replace('\\', '/'),
+    os.path.join(CWD, 'templates'),
 )
 
-#CONTEXT_PROCESSORS = (
-#
-#)
-
 INSTALLED_APPS = (
+    'django.contrib.staticfiles',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -100,5 +77,44 @@ INSTALLED_APPS = (
     'django_extensions',
     'registration',
     'doermann.resume',
+) + cs.gettuple('APPS', 'TESTING') + cs.gettuple('PLUGIN_APPS')
 
+
+
+JAVASCRIPTS = (
+    "jquery.dataTables.js",
+    "jquery.ui.combobox.min.js",
+    "ui.multiselect.js",
+    "jquery.ui.timepicker.min.js",
+    "jquery.form.js",
+    "fg.menu.js",
+    "date.js",
+    "jquery.gritter.js",
+    "jquery.media.js",
+    "autoresize.jquery.min.js",
+    'rgbcolor.js',
+    'jquery.masonry.min.js',
+    'jquery.timeago.js',
 )
+
+STYLE_SHEETS = (
+    "fg.menu.css",
+    "ui.multiselect.css",
+    "messages.css",
+    "gritter.css",
+    "ui-lightness/theme.css",
+)
+
+LESS_SHEETS = (
+    "style.less",
+    "site.less",
+)
+
+
+TEST_RUNNER = 'limbo.testing.AdvancedTestSuiteRunner'
+TESTING_NOT_IMPLEMENTED_FAIL = cs.getboolean('NOT_IMPLEMENTED_FAIL', 'TESTING', True)
+TEST_EXCLUDE = cs.getlist('EXCLUDE', 'TESTING')
+AUTH_PROFILE_MODULE = 'accounts.UserProfile'
+ACCOUNT_ACTIVATION_DAYS = cs.getint('ACCOUNT_ACTIVATION_DAYS', 'REGISTRATION')
+LOGIN_URL = '/accounts/login/'
+

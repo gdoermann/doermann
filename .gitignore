@@ -2,3 +2,5 @@ bin
 .idea
 lib/python2.6
 include
+locals.cfg
+*.db
